@@ -5,8 +5,15 @@ import {View} from 'react-native';
 
 import ToDoItem from './ToDoItem';
 
-const ToDoList = ({todos, toggleComplete, deleteTodo}) => {
-    todos = todos.map((todo, i) => {
+const ToDoList = ({todos, type, toggleComplete, deleteTodo}) => {
+    let filteredTodos = todos;
+    if (type === 'Active') {
+        filteredTodos = todos.filter(todo => todo.complete == false);
+    } else if (type === 'Completed') {
+        filteredTodos = todos.filter(todo => todo.complete == true);
+    }
+
+    filteredTodos = filteredTodos.map((todo, i) => {
         return (
             <ToDoItem 
             key={todo.todoIndex} 
@@ -16,10 +23,7 @@ const ToDoList = ({todos, toggleComplete, deleteTodo}) => {
             />
         )
     });
-    return (<View>{todos}</View>);
+    
+    return (<View>{filteredTodos}</View>);
 };
-
-//const styles = StyleSheet.create({
-//});
-
 export default ToDoList;

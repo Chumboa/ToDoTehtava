@@ -1,18 +1,19 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableHighlight, View } from 'react-native';
 
-const FilterButton = ({onPress, complete, name}) => (
+const FilterButton = ({onPress, type, name}) => (
     <TouchableHighlight
         onPress={onPress}
         underlayColor='#efefef'
-        style={styles.button}>
+        style={[styles.button,
+            name === type ? styles.activeButton : null]}>
         <Text style={[
             styles.text,
-            complete ? styles.complete: null,
+            name === type ? styles.activeText : null
         ]}>{name}</Text>
 
         </TouchableHighlight>
-);
+)
 
 // All, Active, Compeleted
 
@@ -29,9 +30,12 @@ const styles = StyleSheet.create({
     text: {
         color: '#666666'
     },
-    complete: {
-        color: 'green',
-        fontWeight: 'bold'
+    activeButton: { // Add this style
+        backgroundColor: 'green',
+        fontWeight: 'bold',
+    },
+    activeText: {
+        color: 'white'
     }
 });
 

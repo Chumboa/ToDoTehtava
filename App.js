@@ -5,13 +5,12 @@
  * @flow strict-local
  */
 
-import React, { Component } from "react";
+import React, { Component} from "react";
 // import type {Node} from "react";
 import {
     ScrollView,
     StyleSheet,
-    View,
-    Text
+    View
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Filters from './src/Components/Filters/Filters';
@@ -40,6 +39,7 @@ class App extends Component {
         console.log(`input value change ${inputValue}`);
         this.setState({ inputValue });
     }
+
     submitToDo = async () => {
         if(this.state.inputValue.match(/^\s*$/)) {
             return;
@@ -50,24 +50,32 @@ class App extends Component {
             complete: false
         }
         todoIndex++;
+        let existingTodos = await this.getData();
         const todos = [...this.state.todos, todo];
         this.setState({todos, inputValue: ''});
         try {
         await AsyncStorage.setItem('todos', JSON.stringify(todos));
-        } catch (e) {
-            //Error savin data
-        }
+        console.log("Updated todos", todos)
+    } catch (e) {
+        console.log("Error saving data");
     }
+}
+
     getData = async () => {
         try {
-          const value = await AsyncStorage.getItem('todos');
-          if(value !== null) {
+        const value = await AsyncStorage.getItem('todos');
+        if(value !== null) {
             this.setState({todos: JSON.parse(value)});
-          }
-        } catch(e) {
-          // error reading value
         }
-      }
+        return todos ? JSON.parse(todos) : [];
+        } catch(e) {
+        // error reading value
+        }
+    }
+
+    clearAsyncStorage = async() => {
+        AsyncStorage.clear();
+    }
       
     toggleComplete = (idx) => {
         let todos = this.state.todos;
@@ -80,23 +88,24 @@ class App extends Component {
         console.log(`State set to ${JSON.stringify(this.state)}`)
     }
 
+
     filteredComplete = () => {
-        let { todos } = this.state;
-        let filteredTodos;
-        filteredTodos = todos.filter(todo => todo.complete == true);
-        this.setState({filteredTodos});        
+        let type = this.state.type;
+        type = 'Completed';
+        this.setState({type});
+        console.log(`input value change ${type}`);
     }
     filteredAll = () => {
-        let { todos } = this.state;
-        let filteredTodos;
-        filteredTodos = todos.filter(todo => todo.complete == true ||todo.complete == false);
-        this.setState({filteredTodos});        
+        let type = this.state.type;
+        type = 'All';
+        this.setState({type});
+        console.log(`input value change ${type}`);    
     }
     filteredActive = () => {
-        let { todos } = this.state;
-        let filteredTodos;
-        filteredTodos = todos.filter(todo => todo.complete == false);
-        this.setState({filteredTodos});        
+        let type = this.state.type;
+        type = 'Active';
+        this.setState({type: 'Active'});
+        console.log(`input value change ${type}`);
     }
 
     deleteTodo = (idx) => {
@@ -104,15 +113,10 @@ class App extends Component {
         todos = todos.filter((todo) => todo.todoIndex !== idx)
         this.setState({todos});
     } 
-    
 
-
-    
-    
-
-
+1231
     render() {
-        const { inputValue, todos} = this.state;
+        const { inputValue, filteredTodos, todos, type} = this.state;
         return (
             <View style={styles.container}>
                 <ScrollView keyboardShouldPersistTaps="always"
@@ -123,15 +127,18 @@ class App extends Component {
                 inputChange={(text) => this.inputChange(text)}
                 />
                 <Filters
-                todos={todos}
+                type={type}
                 filteredComplete={this.filteredComplete}
                 filteredActive={this.filteredActive}
                 filteredAll={this.filteredAll}
+                clearAsyncStorage={this.clearAsyncStorage}
                 />
                 <Button 
                 submitToDo={this.submitToDo}/>
                 <ToDoList 
+                type={type}
                 todos={todos}
+                filteredTodos={filteredTodos}
                 toggleComplete={this.toggleComplete}
                 deleteTodo={this.deleteTodo}
                 />
@@ -140,7 +147,8 @@ class App extends Component {
         )
     }
 }
-
+333
+333
 
 const styles = StyleSheet.create({
     container: {
