@@ -1,2 +1,1 @@
-# Kapakka
 # Koulutehtävä, todoapp
